@@ -6,107 +6,60 @@ import java.io.*;
 public class MainClass 
 {
 	public static void main(String[] args) throws FileNotFoundException
-	{
-	/*	File file = new File("/Users/justinroberts/eclipse-workspace/M2_SDLC_Assingment/The_Raven.txt");
-		Scanner scan = new Scanner(file);
-		
-		
-		while (scan.hasNextLine())
-		      System.out.println(scan.nextLine());  */
-		
+	{	
 		HashMap<String, Integer> words = new HashMap<String, Integer>();
 
-		// Retrieving the path as parameter to Method1()
-		// above to get the file to be read
+		// Pass text through getWords Method and retrieve word count
 		getWords("/Users/justinroberts/eclipse-workspace/M2_SDLC_Assingment/The_Raven.txt", words);
 
 		Map<String, Integer>sortedwords = sortByValue(words);
-		// Variable holding the maximum
-		// repeated word count in a file
-		//int max = getMaxOccurrence(words);
 
-		for (Iterator<Entry<String, Integer>> iterator = sortedwords.entrySet().iterator(); iterator.hasNext();) {
-			Entry<String, Integer> word = iterator.next();
-			// Print and display word-count pair
-			System.out.println("Word: " + word.getKey() + " \t\tTimes Counted: "+ word.getValue());
-      // }
+		for (Entry<String, Integer> word : sortedwords.entrySet()) 
+		{
+			
+			System.out.println("\tWord: " + word.getKey() + " \t\tTimes Counted: "+ word.getValue());
 		}
-
-}
-
+	}
+	
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Method to turn file contents into String and count words
 	static void getWords(String fileName, Map<String, Integer> words) throws FileNotFoundException
 	{
-		// Creating a Scanner class object
 		Scanner file = new Scanner(new File(fileName));
 		
-		// Condition check using hasNext() method which
-		// holds true till there is word being read from the
-		// file.
-		// As the end of file content,condition violates
-		while (file.hasNext()) {
-
-			// Reading word using next() method
+		while (file.hasNext())
+		{
 			String word = file.next();
 			word = word.toLowerCase(); word = word.replaceAll("[^a-zA-Z0-9]", "");
 			// Frequency count variable
 			Integer count = words.get(word);
 
 			// If the same word is repeating
-			if (count != null) {
-
-				// Incrementing corresponding count by unity
-				// every time it repeats
-				// while reading from the file
+			if (count != null) 
+			{
 				count++;
 			}
 			else
-
-				// If word never occurred after occurring
-				// once, set count as unity
+				// If word never occurred after occurring once, set count as unity
 				count = 1;
 			words.put(word, count);
 		}
-
-		// Close the file and free up the resources
+		
+		// Close the file
 		file.close();
 	}
-
-	// Method 2 - getMaxOccurrence()
-	// To get maximum occurred Word
-	static int getMaxOccurrence(Map<String, Integer> words)
-	{
-		// Initially set maximum count as unity
-		int max = 1;
-
-		// Iterating over above Map using for-each loop
-		for (Entry<String, Integer> word :
-			words.entrySet()) {
-
-			// Condition check
-			// Update current max value  with the value
-			// exceeding unity in Map while traversing
-			if (word.getValue() > max) {
-				max = word.getValue();
-			}
-		}
-
-		// Return the maximum value from the Map
-		return max;
-	}
 	
-	// function to sort hashmap by values
-    public static Map<String, Integer> sortByValue(HashMap<String, Integer> sortw)
-    {
-//    	Map<String, Integer> res = sortw.entrySet().stream()
-//    	        .sorted((o1, o2) -> (o2.getValue()).compareTo(o1.getValue()))
-//    	        .limit(20)
-//    	        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-    	
-    	Map<String, Integer> res = sortw.entrySet().stream()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Method to sort hashmap by values and limit hashmap output to only 20
+    public static Map<String, Integer> sortByValue(HashMap<String, Integer> wordsort)
+    {	
+    	Map<String, Integer> res = wordsort.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(20)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+    	
+    	return res;
 //        // Create a list from elements of HashMap
 //        List<Map.Entry<String, Integer> > list =
 //               new LinkedList<Map.Entry<String, Integer> >(sortw.entrySet());
@@ -127,6 +80,6 @@ public class MainClass
 //        	 }
 //        	
 //        return temp;
-		return res;
+		
     }
 }
