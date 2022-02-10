@@ -2,35 +2,54 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class MainClass 
 {
-	public static void main(String[] args) throws FileNotFoundException
+	public static void main(String[] args) throws Exception
 	{	
 		HashMap<String, Integer> words = new HashMap<String, Integer>();
 
-		// Pass text through getWords Method and retrieve word count
-		getWords("/Users/justinroberts/eclipse-workspace/M2_SDLC_Assingment/The_Raven.txt", words);
+		// Pass url through getWords Method and retrieve word count
+		getWords("https://www.gutenberg.org/files/1065/1065-h/1065-h.htm", words);
 
 		Map<String, Integer>sortedwords = sortByValue(words);
 
 		for (Entry<String, Integer> word : sortedwords.entrySet()) 
-		{
-			
-			System.out.println("\tWord: " + word.getKey() + " \t\tTimes Counted: "+ word.getValue());
+		{	
+			System.out.println("Word: " + word.getKey() + " \t\tTimes Counted: "+ word.getValue());
 		}
 	}
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Method to turn file contents into String and count words
-	static void getWords(String fileName, Map<String, Integer> words) throws FileNotFoundException
+	// Method to turn website contents into String and count words
+	static void getWords(String url, Map<String, Integer> words) throws Exception
 	{
-		Scanner file = new Scanner(new File(fileName));
+		URL website = new URL(url);
+		Scanner scan = new Scanner(website.openStream());
+		StringBuffer sb = new StringBuffer();
 		
-		while (file.hasNext())
+		while (scan.hasNext()) {
+			sb.append(scan.next());
+			sb.append(System.lineSeparator());
+		}
+		
+		
+		String res = sb.toString().replaceAll("<[^>]*>", " ").replaceAll("mdash", "\n").replaceAll("\\-", "\n");
+		res = res.substring(res.indexOf("The", 1550)-1);
+		res = res.substring(0,res.indexOf("!", 6500)+1);
+		res = res.replaceAll("\\p{Punct}", "");
+		res = res.replaceAll("\\W", "\n");
+		res = res.replaceAll("\\s+","\n");
+		res = res.trim();
+		
+		Scanner wc = new Scanner(res);
+		
+		while (wc.hasNext())
 		{
-			String word = file.next();
-			word = word.toLowerCase(); word = word.replaceAll("[^a-zA-Z0-9]", "");
+			String word = wc.nextLine();
+			word = word.toLowerCase(); 
 			// Frequency count variable
 			Integer count = words.get(word);
 
@@ -44,9 +63,9 @@ public class MainClass
 				count = 1;
 			words.put(word, count);
 		}
+		wc.close();
+		scan.close();
 		
-		// Close the file
-		file.close();
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,27 +78,6 @@ public class MainClass
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     	
-    	return res;
-//        // Create a list from elements of HashMap
-//        List<Map.Entry<String, Integer> > list =
-//               new LinkedList<Map.Entry<String, Integer> >(sortw.entrySet());
-// 
-//        // Sort the list
-//        Collections.sort(list, new Comparator<Map.Entry<String, Integer> >() {
-//            public int compare(Map.Entry<String, Integer> o1,
-//                               Map.Entry<String, Integer> o2)
-//            {
-//                return (o2.getValue()).compareTo(o1.getValue());
-//            }
-//        });
-//         
-//        // put data from sorted list to hashmap
-//        HashMap<String, Integer> temp = new LinkedHashMap<String, Integer>();
-//        	 for (Map.Entry<String, Integer> aa : list) {
-//                 temp.put(aa.getKey(), aa.getValue());
-//        	 }
-//        	
-//        return temp;
-		
+    	return res;		
     }
 }
